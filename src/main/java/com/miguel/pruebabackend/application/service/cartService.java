@@ -1,10 +1,12 @@
 package com.miguel.pruebabackend.application.service;
 
-
 import com.miguel.pruebabackend.domain.model.Cart;
 import com.miguel.pruebabackend.domain.model.Product;
 import com.miguel.pruebabackend.domain.port.cartRepositoryPort;
+import org.springframework.dao.DataAccessException;
+import com.miguel.pruebabackend.common.exceptions.CartNotFoundException;
 import org.springframework.stereotype.Service;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +27,7 @@ import java.util.Optional;
  * @version 1.0
  */
 
+@Slf4j
 @Service
 public class cartService {
 
@@ -42,8 +45,14 @@ public class cartService {
      *  @return el carrito creado y guardado.
      */
     public Cart createCart() {
-        Cart cart = new Cart();
-        return repositoryCart.save(cart);
+        try {
+            Cart cart = new Cart();
+            return repositoryCart.save(cart);
+        }catch (DataAccessException e) {
+            log.error("Error al crear el carrito: {}", e.getMessage());
+            throw new RuntimeException("No se pudo crear el carrito.");
+        }
+
     }
 
     /**
@@ -51,14 +60,23 @@ public class cartService {
      * Obtiene la información de un carrito y actualiza el último acceso
      *
      * @param id el identificador del carrito a buscar.
-     * @return un -link Optional- que contiene el carrito si existe, - code Optional.empty() - en caso contrario
+     * @return un Optional que contiene el carrito si existe, Optional.empty() en caso contrario.
      */
     public Optional<Cart> getCart(Long id) {
+
+        if (id == null || id <= 0) {
+            throw new IllegalArgumentException("El ID del carrito no puede ser nulo o negativo.");
+        }
+
         Optional<Cart> cartOpt = repositoryCart.findById(id);
-        cartOpt.ifPresent(cart -> {
+        if (cartOpt.isPresent()) {
+            Cart cart = cartOpt.get();
             cart.updateLastAccessed();
             repositoryCart.save(cart);
-        });
+            log.info("Carrito con ID {} encontrado y actualizado.", id);
+        } else {
+            log.warn("Carrito con ID {} no encontrado.", id);
+        }
         return cartOpt;
     }
 
@@ -69,37 +87,80 @@ public class cartService {
      * @param cartId el identificador del carrito al cual se agregarán los productos.
      * @param products la lista de productos a agregar.
      * @return el carrito actualizado después de guardar los cambios.
-     * @throws RuntimeException si no se encuentra un carrito con el identificador proporcionado.
+     * @throws CartNotFoundException si no se encuentra un carrito con el identificador proporcionado.
      */
     public Cart addProducts(Long cartId, List<Product> products) {
+
+        if (cartId == null || cartId <= 0) {
+            log.error("ID inválido: {}. Debe ser un número positivo y no nulo.", cartId);
+            return null;
+        }
+
+        if (products == null || products.isEmpty()) {
+            log.error("Lista de productos vacía o nula. No se pueden agregar productos.");
+            return null;
+        }
+
         Optional<Cart> optionalCart = repositoryCart.findById(cartId);
         if (optionalCart.isPresent()) {
             Cart cart = optionalCart.get();
             cart.getProducts().addAll(products);
             cart.updateLastAccessed();
+            log.info("Se añadieron {} productos al carrito con ID {}.", products.size(), cartId);
             return repositoryCart.save(cart);
+        } else {
+            log.warn("Intento de agregar productos a un carrito inexistente (ID {}).", cartId);
+            return null;
         }
-        throw new RuntimeException("Carrito no encontrado");
     }
 
     /** @Method deleteInactiveCarts
      *
      * Elimina un carrito dado su ID
      * @param cartId el identificador del carrito a eliminar.
+     * @throws CartNotFoundException si el carrito no existe.
      */
     public void deleteCart(Long cartId) {
-        repositoryCart.delete(cartId);
+
+        if (cartId == null || cartId <= 0) {
+            log.error("ID inválido: {}. Debe ser un número positivo y no nulo.", cartId);
+        }
+        try {
+            Optional<Cart> cartOpt = repositoryCart.findById(cartId);
+            if (cartOpt.isPresent()) {
+                repositoryCart.delete(cartId);
+                log.info("Carrito con ID {} eliminado correctamente.", cartId);
+            } else {
+                log.warn("Intento de eliminar un carrito inexistente (ID {}).", cartId);
+            }
+        }catch(DataAccessException e){
+            log.error("Error al eliminar el carrito con ID {}: {}", cartId, e.getMessage());
+            throw new RuntimeException("No se pudo eliminar el carrito.");
+        }
     }
 
     /**
      * @Method deleteInactiveCarts
      *
      * Este metodo recorre la lista de carritos inactivos obtenida del repositorio y elimina aquellos que esten inactivos por 10 minutos.
+     * @throws RuntimeException si no hay carritos para eliminar.
      */
     public void deleteInactiveCarts() {
-        for (Cart cart : repositoryCart.findInactiveCarts()) {
-            repositoryCart.delete(cart.getId());
+
+        try {
+
+            List<Cart> inactiveCarts = repositoryCart.findInactiveCarts();
+            if (inactiveCarts.isEmpty()) {
+                log.info("No hay carritos inactivos para eliminar.");
+            }
+
+            for (Cart cart : inactiveCarts) {
+                repositoryCart.delete(cart.getId());
+                log.info("Carrito con ID {} eliminado por inactividad.", cart.getId());
+            }
+        }  catch (DataAccessException e) {
+        log.error("Error al eliminar carritos inactivos: {}", e.getMessage());
+        throw new RuntimeException("No se pudo eliminar carritos inactivos.");
         }
     }
-
 }
