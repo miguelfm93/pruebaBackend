@@ -1,13 +1,14 @@
-package com.miguel.pruebabackend.infrastructure.adapter;
+package com.miguel.pruebabackend.infrastructure.config;
 
 
 import com.miguel.pruebabackend.application.service.cartService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+
 
 @Slf4j
-@Component
+@Configuration
 public class CartCleaner {
 
 
@@ -18,8 +19,13 @@ public class CartCleaner {
         this.serviceCart = serviceCart;
     }
 
-    // Este metodo se ejecuta cada 60 segundos y elimina carritos inactivos
-    @Scheduled(fixedRate = 60000)
+    /**
+     * Tarea programada que se ejecuta cada 120 segundos para limpiar carritos inactivos.
+     *
+     * Registra en el log el inicio de la limpieza de carritos inactivos.
+     * Invoca el metodo {@code deleteInactiveCarts} del servicio de carritos para eliminar aquellos que han estado inactivos por mas de 10 min
+     */
+    @Scheduled(fixedRate = 120000)
     public void cleanupInactiveCarts() {
         try {
             log.info("Ejecutando limpieza de carritos inactivos...");

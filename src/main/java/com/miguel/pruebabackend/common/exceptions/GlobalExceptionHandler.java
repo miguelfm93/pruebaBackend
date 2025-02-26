@@ -1,6 +1,5 @@
 package com.miguel.pruebabackend.common.exceptions;
 
-import com.miguel.pruebabackend.domain.model.Cart;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

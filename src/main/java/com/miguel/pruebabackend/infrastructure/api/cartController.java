@@ -1,4 +1,4 @@
-package com.miguel.pruebabackend.infrastructure.adapter.rest;
+package com.miguel.pruebabackend.infrastructure.api;
 
 import com.miguel.pruebabackend.common.exceptions.CartNotFoundException;
 import com.miguel.pruebabackend.application.service.cartService;
@@ -6,6 +6,7 @@ import com.miguel.pruebabackend.common.exceptions.InvalidProductException;
 import com.miguel.pruebabackend.domain.model.Cart;
 import com.miguel.pruebabackend.domain.model.Product;
 
+import com.miguel.pruebabackend.infrastructure.persistence.adapter.CartRepositoryAdapter;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Controlador REST para la gestión de carritos de compras.
@@ -36,6 +39,7 @@ public class cartController {
      */
     public cartController(cartService serviceCart) {
         this.serviceCart = serviceCart;
+
     }
 
     /**
@@ -45,7 +49,6 @@ public class cartController {
     @PostMapping
     public ResponseEntity<Cart> createCart() {
         Cart cart = serviceCart.createCart();
-        log.info("Carrito creado con éxito, ID: {}", cart.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(cart);
     }
 
@@ -57,13 +60,10 @@ public class cartController {
      * @throws CartNotFoundException si el carrito con el ID proporcionado no existe.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Cart> getCart(@PathVariable @Min(1) Long id) {
-        return serviceCart.getCart(id)
-                .map(cart -> {
-                    log.info("Carrito con ID {} encontrado.", id);
-                    return ResponseEntity.ok(cart);
-                })
-                .orElseThrow(() -> new CartNotFoundException("El carrito con ID " + id + " no existe."));
+    public ResponseEntity<Optional> getCart(@PathVariable Long id) {
+            Optional cart = serviceCart.getCart(id);
+            // Si se encuentra el carrito, se devuelve con un 200 OK
+            return ResponseEntity.ok(cart);
     }
 
     /**
@@ -76,12 +76,8 @@ public class cartController {
      */
     @PostMapping("/{id}/products")
     public ResponseEntity<Cart> addProducts(@PathVariable @Min(1) Long id, @RequestBody @Valid List<Product> products) {
-        if (products.isEmpty()) {
-            throw new InvalidProductException("La lista de productos no puede estar vacía.");
-        }
-        Cart updatedCart = serviceCart.addProducts(id, products);
-        log.info("Se añadieron {} productos al carrito con ID {}.", products.size(), id);
-        return ResponseEntity.ok(updatedCart);
+        Cart cart = serviceCart.addProducts(id, products);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(cart);
     }
 
     /**
@@ -91,9 +87,9 @@ public class cartController {
      * @return ResponseEntity con estado 204 (NO CONTENT) si la eliminación fue exitosa.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCart(@PathVariable @Min(1) Long id) {
+    public ResponseEntity<Void> deleteCart(@PathVariable @Min(1) long id) {
         serviceCart.deleteCart(id);
-        log.info("Carrito con ID {} eliminado.", id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
     }
 }

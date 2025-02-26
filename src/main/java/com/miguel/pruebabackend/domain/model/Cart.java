@@ -1,9 +1,8 @@
 package com.miguel.pruebabackend.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
  * @version 1.0
  */
 
-//Getters , Setter y constructor generados automaitacmente con lombok
+//Getters , Setter y constructor generados automaticamente con lombok
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -22,12 +21,26 @@ public class Cart {
 
     //Atributos
     private Long id;
-    private List<Product> products;
-    private LocalDateTime lastAccessed;
+    private List<Product> products = new ArrayList<>();
+    private LocalDateTime lastActivityTime;
 
 
-    // Actualiza la fecha y hora del último acceso
-    public void updateLastAccessed() {
-        this.lastAccessed = LocalDateTime.now();
+    /**
+     * Actualiza la última vez que se usó el carrito.
+     */
+    public void updateLastAccessed(LocalDateTime lastAccessed) {
+        this.lastActivityTime = LocalDateTime.now();
     }
+
+    /**
+     * Agrega varios productos al carrito.
+     *
+     * @param product Lista de productos a agregar.
+     */
+     public void addProducts(List<Product> product) {
+        this.products.addAll(product);
+        updateLastAccessed(lastActivityTime);
+    }
+
+
 }

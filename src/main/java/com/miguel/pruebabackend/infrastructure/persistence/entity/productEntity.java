@@ -1,4 +1,4 @@
-package com.miguel.pruebabackend.infrastructure.entity;
+package com.miguel.pruebabackend.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -19,12 +19,13 @@ import lombok.NoArgsConstructor;
 @Table(name = "productos")
 public class productEntity {
 
-    //Identicador unico del producto
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String description;
     private Double amount;
+
 
 }
 

@@ -1,7 +1,7 @@
-package com.miguel.pruebabackend.infrastructure.repository;
+package com.miguel.pruebabackend.infrastructure.persistence.repository;
 
 import org.springframework.stereotype.Repository;
-import com.miguel.pruebabackend.infrastructure.entity.cartEntity;
+import com.miguel.pruebabackend.infrastructure.persistence.entity.cartEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
@@ -21,5 +21,6 @@ public interface  SpringDataCartRepository extends JpaRepository < cartEntity , 
      * @param dateTime la fecha y hora límite. Se retornarán los carritos cuyo último acceso sea anterior a este valor.
      * @return una lista de instancias de {@code cartEntity} que cumplen la condición de inactividad.
      */
-    List<cartEntity> findByLastAccessedBefore(LocalDateTime dateTime);
+    List<cartEntity> findBylastActivityTimeBefore(LocalDateTime dateTime);
+
 }

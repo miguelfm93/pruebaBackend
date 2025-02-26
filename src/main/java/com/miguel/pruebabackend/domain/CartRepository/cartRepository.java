@@ -1,11 +1,13 @@
-package com.miguel.pruebabackend.domain.port;
+package com.miguel.pruebabackend.domain.CartRepository;
 
 import com.miguel.pruebabackend.domain.model.Cart;
+
+
 import java.util.Optional;
 import java.util.List;
 
 /**
- * Interfaz que define las operaciones de persistencia para objetos de tipo cart.
+ * Interfaz que define las operaciones de persistencia para objetos de tipo Cart.
  *
  * Esta interfaz forma parte de la capa de dominio y contiene operaciones
  * básicas sobre los carritos, permitiendo guardar, buscar, eliminar y obtener aquellos carritos
@@ -15,7 +17,7 @@ import java.util.List;
  * @version 1.0
  */
 
-public interface cartRepositoryPort {
+public interface cartRepository  {
 
     /**
      * Guarda o actualiza un objeto de tipo {@link Cart} en la base de datos.
@@ -29,6 +31,7 @@ public interface cartRepositoryPort {
 
     /**
      * Busca un carrito por su identificador.
+     *
      * @param id el identificador del carrito a buscar.
      * @return un {@link Optional} que contiene el carrito encontrado, o {@code Optional.empty()} si no se encuentra.
      */
@@ -45,5 +48,5 @@ public interface cartRepositoryPort {
      * Inactivos aquellos carritos que han estado sin actividad durante más de 10 minutos.
      * @return una lista de objetos {@link Cart} que cumplen la condición de inactividad.
      */
-    List<Cart> findInactiveCarts();
+    List<Cart> searchAll();
 }
