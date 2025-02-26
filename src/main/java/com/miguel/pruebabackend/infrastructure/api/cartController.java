@@ -6,7 +6,7 @@ import com.miguel.pruebabackend.common.exceptions.InvalidProductException;
 import com.miguel.pruebabackend.domain.model.Cart;
 import com.miguel.pruebabackend.domain.model.Product;
 
-import com.miguel.pruebabackend.infrastructure.persistence.adapter.CartRepositoryAdapter;
+
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 

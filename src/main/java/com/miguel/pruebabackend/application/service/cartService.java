@@ -3,7 +3,6 @@ package com.miguel.pruebabackend.application.service;
 import com.miguel.pruebabackend.domain.model.Cart;
 import com.miguel.pruebabackend.domain.model.Product;
 import com.miguel.pruebabackend.domain.CartRepository.cartRepository;
-import com.miguel.pruebabackend.infrastructure.persistence.entity.cartEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.dao.DataAccessException;
 import com.miguel.pruebabackend.common.exceptions.CartNotFoundException;
