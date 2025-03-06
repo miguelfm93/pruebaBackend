@@ -7,6 +7,7 @@ A cart MUST be deleted automatically due to 10 minutes of inactivity
 Get a cart information given its id
 Add one or more products to that cart. A product consists of the following properties: ○ Id (numerical) ○ Description (alphanumerical) ○ Amount (numerical)
 Delete a cart
+
 LA APP SERA ACCESIBLE EN LA RUTA SIGUIENTE http://localhost:9092.
 
 
